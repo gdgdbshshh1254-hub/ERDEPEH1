@@ -24,16 +24,16 @@ jobs:
 
     - name: Create RDP User
       run: |
-        net user Administrator Password123456! /add
-        net localgroup administrators Administrator /add
+        net user rdpuser Pass@12345678 /add
+        net localgroup administrators rdpuser /add
 
     - name: Show Tailscale IP
       run: |
         $ip = & "C:\Program Files\Tailscale\tailscale.exe" ip -4
         Write-Host "=========================================="
         Write-Host "RDP IP Address : $ip"
-        Write-Host "Username       : Administrator"
-        Write-Host "Password       : Password123456!"
+        Write-Host "Username       : rdpuser"
+        Write-Host "Password       : Pass@12345678"
         Write-Host "=========================================="
 
     - name: Keep Alive
