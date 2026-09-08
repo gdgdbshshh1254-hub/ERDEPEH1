@@ -1,0 +1,41 @@
+name:RDP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+    - name: Connect to Tailscale
+      uses: tailscale/github-action@v2
+      with:
+        oauth-client-id: ""
+        oauth-secret: ""
+        authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+        hostname: github-rdp-runner
+
+    - name: Enable Remote Desktop
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+    - name: Create RDP User
+      run: |
+        net user Administrator Password123456! /add
+        net localgroup administrators Administrator /add
+
+    - name: Show Tailscale IP
+      run: |
+        $ip = tailscale ip -4
+        Write-Host "=========================================="
+        Write-Host "RDP IP Address : $ip"
+        Write-Host "Username       : Administrator"
+        Write-Host "Password       : Password123456!"
+        Write-Host "=========================================="
+
+    - name: Keep Alive
+      run: |
+        while ($true) { Start-Sleep -Seconds 3600 }
